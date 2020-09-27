@@ -51,7 +51,7 @@ def publish_subcommand(publish):
 
         # Check for heroku-builds plugin
         plugins = [
-            line.split()[0] for line in check_output(["heroku", "plugins"]).splitlines()
+            line.split()[0] for line in check_output(["heroku", "plugins"], shell=True).splitlines()
         ]
         if b"heroku-builds" not in plugins:
             click.echo(
@@ -61,7 +61,7 @@ def publish_subcommand(publish):
                 "Install it? (this will run `heroku plugins:install heroku-builds`)",
                 abort=True,
             )
-            call(["heroku", "plugins:install", "heroku-builds"])
+            call(["heroku", "plugins:install", "heroku-builds"], shell=True)
 
         extra_metadata = {
             "title": title,
@@ -107,7 +107,7 @@ def publish_subcommand(publish):
             app_name = None
             if name:
                 # Check to see if this app already exists
-                list_output = check_output(["heroku", "apps:list", "--json"]).decode(
+                list_output = check_output(["heroku", "apps:list", "--json"], shell=True).decode(
                     "utf8"
                 )
                 apps = json.loads(list_output)
@@ -123,15 +123,15 @@ def publish_subcommand(publish):
                 if name:
                     cmd.append(name)
                 cmd.append("--json")
-                create_output = check_output(cmd).decode("utf8")
+                create_output = check_output(cmd, shell=True).decode("utf8")
                 app_name = json.loads(create_output)["name"]
 
             for key, value in environment_variables.items():
                 call(
-                    ["heroku", "config:set", "-a", app_name, "{}={}".format(key, value)]
+                    ["heroku", "config:set", "-a", app_name, "{}={}".format(key, value)], shell=True
                 )
 
-            call(["heroku", "builds:create", "-a", app_name, "--include-vcs-ignore"])
+            call(["heroku", "builds:create", "-a", app_name, "--include-vcs-ignore"], shell=True)
 
 
 @contextmanager
