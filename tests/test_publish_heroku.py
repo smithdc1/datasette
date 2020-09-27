@@ -26,10 +26,10 @@ def test_publish_heroku_installs_plugin(mock_call, mock_check_output, mock_which
         result = runner.invoke(cli.cli, ["publish", "heroku", "t.db"], input="y\n")
         assert 0 != result.exit_code
     mock_check_output.assert_has_calls(
-        [mock.call(["heroku", "plugins"]), mock.call(["heroku", "apps:list", "--json"])]
+        [mock.call(["heroku", "plugins"], shell=True)]
     )
     mock_call.assert_has_calls(
-        [mock.call(["heroku", "plugins:install", "heroku-builds"])]
+        [mock.call(["heroku", "plugins:install", "heroku-builds"], shell=True)]
     )
 
 
@@ -81,9 +81,9 @@ def test_publish_heroku(mock_call, mock_check_output, mock_which):
 def test_publish_heroku_plugin_secrets(mock_call, mock_check_output, mock_which):
     mock_which.return_value = True
     mock_check_output.side_effect = lambda s: {
-        "['heroku', 'plugins']": b"heroku-builds",
-        "['heroku', 'apps:list', '--json']": b"[]",
-        "['heroku', 'apps:create', 'datasette', '--json']": b'{"name": "f"}',
+        "['heroku', 'plugins'], shell=True": b"heroku-builds",
+        "['heroku', 'apps:list', '--json'], shell=True": b"[]",
+        "['heroku', 'apps:create', 'datasette', '--json'], shell=True": b'{"name": "f"}',
     }[repr(s)]
     runner = CliRunner()
     with runner.isolated_filesystem():
