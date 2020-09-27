@@ -51,7 +51,8 @@ def publish_subcommand(publish):
 
         # Check for heroku-builds plugin
         plugins = [
-            line.split()[0] for line in check_output(["heroku", "plugins"], shell=True).splitlines()
+            line.split()[0]
+            for line in check_output(["heroku", "plugins"], shell=True).splitlines()
         ]
         if b"heroku-builds" not in plugins:
             click.echo(
@@ -107,9 +108,9 @@ def publish_subcommand(publish):
             app_name = None
             if name:
                 # Check to see if this app already exists
-                list_output = check_output(["heroku", "apps:list", "--json"], shell=True).decode(
-                    "utf8"
-                )
+                list_output = check_output(
+                    ["heroku", "apps:list", "--json"], shell=True
+                ).decode("utf8")
                 apps = json.loads(list_output)
 
                 for app in apps:
@@ -128,10 +129,20 @@ def publish_subcommand(publish):
 
             for key, value in environment_variables.items():
                 call(
-                    ["heroku", "config:set", "-a", app_name, "{}={}".format(key, value)], shell=True
+                    [
+                        "heroku",
+                        "config:set",
+                        "-a",
+                        app_name,
+                        "{}={}".format(key, value),
+                    ],
+                    shell=True,
                 )
 
-            call(["heroku", "builds:create", "-a", app_name, "--include-vcs-ignore"], shell=True)
+            call(
+                ["heroku", "builds:create", "-a", app_name, "--include-vcs-ignore"],
+                shell=True,
+            )
 
 
 @contextmanager
